@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Flunt.Validations;
 using Store.Domain.Enums;
 
@@ -7,6 +8,8 @@ namespace Store.Domain.Entities
 {
     public class Order : Entity
     {
+        private IList<OrderItem> _items;
+
         public Order(Customer customer, decimal deliveryFee, Discount discount)
         {
             AddNotifications(
@@ -21,13 +24,13 @@ namespace Store.Domain.Entities
             Status = EOrderStatus.WaitingPayment;
             DeliveryFee = deliveryFee;
             Discount = discount;
-            Items = new List<OrderItem>();
+            _items = new List<OrderItem>();
         }
 
         public Customer Customer { get; private set; }
         public DateTime Date { get; private set; }
         public string Number { get; private set; }
-        public IList<OrderItem> Items { get; private set; }
+        public IReadOnlyCollection<OrderItem> Items { get => _items.ToArray(); }
         public decimal DeliveryFee { get; private set; }
         public Discount Discount { get; private set; }
         public EOrderStatus Status { get; private set; }
@@ -38,7 +41,7 @@ namespace Store.Domain.Entities
 
             //AddNotifications(item.Notifications);
             if (item.Valid)
-                Items.Add(item);
+                _items.Add(item);
         }
 
         public decimal Total()
